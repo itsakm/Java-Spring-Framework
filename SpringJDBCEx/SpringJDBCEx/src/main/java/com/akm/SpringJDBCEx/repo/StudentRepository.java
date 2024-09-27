@@ -2,45 +2,31 @@ package com.akm.SpringJDBCEx.repo;
 
 import com.akm.SpringJDBCEx.modal.Student;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCallback;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.*;
 
 @Repository
 public class StudentRepository {
 
-    private NamedParameterJdbcTemplate jdbcTemplate;
+    private JdbcTemplate jdbcTemplate;
 
-    public NamedParameterJdbcTemplate getJdbcTemplate() {
+    public JdbcTemplate getJdbcTemplate() {
         return jdbcTemplate;
     }
 
     @Autowired
-    public void setJdbcTemplate(NamedParameterJdbcTemplate jdbcTemplate) {
+    public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
     public void save(Student student)
     {
-        String sql = "INSERT INTO student VALUES(:rollno,:name,:marks);";
-//        String sql = "select * from assignment where username='"+student.getRollNo()+"';";
-        Map<String, Object> map = new HashMap<String,Object>();
-        map.put("rollno",student.getRollNo());
-        map.put("name",student.getName());
-        map.put("marks",student.getMarks());
-        jdbcTemplate.execute(sql, map, new PreparedStatementCallback() {
-            public Object doInPreparedStatement(PreparedStatement ps) throws SQLException, DataAccessException{
-                return ps.executeUpdate();
-            }
-        });
+        String sql = "insert into student (rollno,name,marks) values(?,?,?)";
+
+        int rows = jdbcTemplate.update(sql,student.getRollNo(),student.getName(),student.getMarks());
+        System.out.println(rows + " affected!");
     }
 
     public List<Student> findAll() {
